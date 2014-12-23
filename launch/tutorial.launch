@@ -1,0 +1,35 @@
+<!-- Launch file for tutorial -->
+
+<launch>
+
+   <node pkg="beginner_tutorial" type="subscriber_node" name="listener" output="screen" >
+   <node pkg="beginner_tutorial" type="publisher_talker" name="talker" output="screen" >  
+
+    </node>
+	 
+</launch>
+
+
+
+
+
+<!-- roscd is equivalent to this.
+ 
+$ cd ~/catkin_ws
+$ source devel/setup.bash
+$ roscd beginner_tutorials
+
+----------------------------
+
+http://wiki.ros.org/ROS/Tutorials/UsingRqtconsoleRoslaunch
+----------------------------
+
+http://wiki.ros.org/ROS/Tutorials/UsingRosEd 			//How to use ROSED
+
+----------------------------
+
+++
+
+
+
+-->
