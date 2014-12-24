@@ -1,3 +1,5 @@
+##LINK@RAHUL::http://wiki.ros.org/catkin/CMakeLists.txt
+
 
 cmake_minimum_required(VERSION 2.8.3)
 project(catkin_tutorial)
@@ -5,11 +7,12 @@ project(catkin_tutorial)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
+find_package(catkin REQUIRED #COMPONENTS
   geometry_msgs
   roscpp
   rospy
   std_msgs
+  message_generation
 )
 
 
@@ -25,9 +28,6 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
-
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
 ## * In the file package.xml:
@@ -50,32 +50,31 @@ find_package(catkin REQUIRED COMPONENTS
 ##@Rahul:LINK::http://wiki.ros.org/th/ROS/Tutorials/CreatingMsgAndSrv ::Tutorial for creating msgs and srvs
 ##@Rahul: Below are the setting done for including the messages and services present in the msg and srv
 ##directories of the catkin_tutorial package.
+##@Rahul: 4-places need to be modified for accessing the srv and msg files
 
-## Generate messages in the 'msg' folder
-#add_message_files(
-#   FILES
-#   Num.msg
-#)
+add_message_files(
+   FILES
+   Num.msg
+)
 
-## Generate services in the 'srv' folder
-#add_service_files(
-#   DIRECTORY srv
-#   FILES
-#   Multiply.srv
-#)
+add_service_files(
+   DIRECTORY srv
+   FILES
+   Multiply.srv
+)
 
 ## Generate actions in the 'action' folder
-# add_action_files(
+#add_action_files(
 #   FILES
 #   Action1.action
 #   Action2.action
-# )
+#)
 
 #@Rahul: For Hydro and later we need to uncomment below lines.
 ##For <rosmake> tool it is simply <generate_messages()>
 ## Generate added messages and services with any dependencies listed here
 #generate_messages(
-#   DEPENDENCIES
+#  DEPENDENCIES
 #  geometry_msgs
 #   std_msgs
 #)
@@ -98,6 +97,7 @@ catkin_package(
 #  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
    CATKIN_DEPENDS message_runtime
+   DEPENDS roscpp std_msgs 
 )
 
 ###########
@@ -113,13 +113,28 @@ include_directories(
   ${roscpp_INCLUDE_DIRS}
   ${rospy_INCLUDE_DIRS}
 )
-#Adding executable and their linked libraries
+#Adding executable and their linked libraries  #@Rahul:add_dependencies#what does this mean??
+
 add_executable(subscriber_node src/subscriber_node.cpp)
 target_link_libraries(subscriber_node ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
+
 add_executable(publisher_talker src/publisher_talker.cpp)
 target_link_libraries(publisher_talker ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
 
+add_executable(multiply_server src/server.cpp)
+add_dependencies(multiply_server catkin_tutorial_gencpp )   			
+target_link_libraries(multiply_server ${catkin_LIBRARIES} ${roscpp_LIBRARIES} )
 
+add_executable(multiply_client src/client.cpp)
+target_link_libraries(multiply_client ${roscpp_LIBRARIES} ${catkin_LIBRARIES} )
+add_dependencies(multiply_client catkin_tutorial_gencpp)
+
+
+
+
+#${catkin_tutorial_EXPORTED_TARGETS} 
+#catkin_tutorial_generate_messages_cpp 
+#catkin_tutorial_generate_services_cpp 
 
 ## Declare a cpp library
 # add_library(catkin_tutorial
