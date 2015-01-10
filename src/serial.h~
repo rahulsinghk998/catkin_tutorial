@@ -1,0 +1,35 @@
+#ifndef Serial_serial_h
+#define Serial_serial_h
+
+#include <ros/ros.h>
+#include <iostream>
+#include <string>
+
+namespace Serial
+{
+	class serial
+	{
+		public:			
+			serial(long int set_baud, int set_parity, int set_stop_bit,string set_port)
+			void Serial::serial::InitPort()
+			int Serial::serial::SerialConnect()
+			char* Serial::serial::SerialRead(void)
+			bool Serial::serial::SerialWrite(char* serialSend,int dataCount)
+			void Serial::serial::SerialDisconnect(void)
+			bool Serial::serial::SerialConnectCheck(void)
+		
+		private:
+			unsigned int baudrate;
+			int parity;
+			int stopbit;
+			string serialport;
+			bool portIsConnected;
+			struct termios oldtio,newtio;
+			int handle;
+		protected:
+			
+	};
+
+}
+
+#endif
