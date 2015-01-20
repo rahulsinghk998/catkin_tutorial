@@ -1,3 +1,7 @@
+/******************************************************************************************************/
+/*		   HELPFUL SITE: http://tldp.org/HOWTO/Serial-Programming-HOWTO/x115.html             */
+/******************************************************************************************************/
+
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -12,9 +16,8 @@
 
 #define BUFFER_SIZE 1024
 #define MISSING_VALUE 1024
-
-#define BAUDRATE B38400            
-#define MODEMDEVICE "/dev/ttyUSB0"
+        
+//#define MODEMDEVICE "/dev/ttyUSB2"
 #define _POSIX_SOURCE 1 				//POSIX compliant source 
 
 namespace Serial
@@ -24,13 +27,90 @@ namespace Serial
 		portIsConnected=false;
 		baudrate=set_baud;
 		parity=set_parity;
-		stopbit=set_stop_bit;
+		stopBit=set_stop_bit;
 		serialport=set_port;
+		dataBits=8;
 	}
 
 	void serial::InitPort()
 	{
-	         newtio.c_cflag = BAUDRATE | CRTSCTS | CS8 | CLOCAL | CREAD;
+		switch(baudrate){
+			case 1200: 
+				newtio.c_cflag |= B1200;
+				break;
+			case 2400:
+				newtio.c_cflag |= B2400;
+				break;
+			case 4800:
+				newtio.c_cflag |= B4800;
+				break;
+			case 9600:					//GIVES 1.17 KBPS
+				newtio.c_cflag |= B9600;
+				break;			
+			case 19200:
+				newtio.c_cflag |= B19200;
+				break;
+			case 38400:
+				newtio.c_cflag |= B38400;
+				break;
+			case 57600:
+				newtio.c_cflag |= B57600;
+				break;
+			case 115200:					//GIVES 125 KBPS
+				newtio.c_cflag |= B115200;
+				break;
+			case 230400:					//GIVES 250 KBPS
+				newtio.c_cflag |= B230400;
+				break;
+			case 460800:					//GIVES 0.5 MBPS
+				newtio.c_cflag |= B460800;
+				break;
+			case 921600:					//GIVES 1 MBPS
+				newtio.c_cflag |= B921600;
+				break;
+			default: 
+				newtio.c_cflag |= B9600;
+				break;
+		 }
+		 switch(parity){
+			case 0:
+				newtio.c_cflag &= ~PARENB;		//CLEAR PARITY ENABLE=>NO PARITY
+				break;
+			case 1:
+				newtio.c_cflag |= PARENB;		//ENABLE PARITY
+				newtio.c_cflag |= PARODD;		//ODD PARITY
+				break;
+			case 2:
+				newtio.c_cflag |= PARENB;
+				newtio.c_cflag |=~PARODD;		//NO ODD PARITY=>EVEN PARITY
+				break;			
+			default:
+				newtio.c_cflag |= ~PARENB;		//DEFAULT=>NO PARITY
+				break;
+		 }
+		 switch(stopBit){
+			case 0:
+				newtio.c_cflag &= ~CSTOPB;		//NO TWO STOP BITS=>ONE STOP BIT
+				break;
+			case 1:	
+				newtio.c_cflag |=CSTOPB;		//TWO STOP BITS
+				break;
+			default:
+				newtio.c_cflag &= ~CSTOPB;
+				break;
+		 }
+		 switch(dataBits){
+			case 7:
+				newtio.c_cflag |= CS7;
+				break;			
+			case 8:
+				newtio.c_cflag |= CS8;
+				break;
+			default:
+				newtio.c_cflag |= CS8;
+		 }
+	         //newtio.c_cflag = BAUDRATE | CRTSCTS | CS8 | CLOCAL | CREAD;
+		 newtio.c_cflag |= CRTSCTS | CLOCAL | CREAD;
 	         newtio.c_iflag = IGNPAR | ICRNL;
 	         newtio.c_oflag = 0;
 	         newtio.c_lflag = ICANON;
@@ -57,9 +137,9 @@ namespace Serial
 	
 	int serial::SerialConnect()
 	{
-		handle = open(MODEMDEVICE, O_RDWR | O_NOCTTY );	//Serial port init//Open port in readwrite 
+		handle = open(serialport.c_str(), O_RDWR | O_NOCTTY );	//Serial port init//Open port in readwrite 
 	        if (handle<0) {					//If unsuccessful <fd> is <-1>
-			perror(MODEMDEVICE); 			//For <perror> function see at the bottom
+			perror(serialport.c_str()); 			//For <perror> function see at the bottom
 			return 1;				//return(RQ_ERR_OPEN_PORT); 
 		}
 		else {
@@ -71,13 +151,20 @@ namespace Serial
 	        tcflush(handle,TCIFLUSH);			//Clean Modem Line
 	        tcsetattr(handle,TCSANOW,&newtio);		//Activate Settings for PORT
 	}
-
-	char* serial::SerialRead(void)
+	
+	//ERROR :: The very first data is having error during the return.
+	//std::string serial::SerialRead(void)
+	int serial::SerialRead(char* serialData,int buffer)
 	{
-		char serialData[255];
-		int strLength;
-		strLength=read(handle,serialData,255);
-		return serialData;
+		//char serialData[255]={'\0'};
+		//printf("SERIAL STRING CHECK : %s \n",serialData);
+		//std::string serialData;
+		//char* serialData;
+		//strLength=read(handle,serialData.c_str(),255);
+		//printf("SERIAL CHECK : %s 	SERIAL LENGTH:%d\n",serialData.c_str(),strLength);
+		//printf("SECOND SERIAL CHECK :%c     SERIAL LENGTH:%d \n",serialData[0],strLength);
+		//printf("SERIAL CHECK :%s     SERIAL LENGTH:%d \n",serialData,strLength);
+		return read(handle,serialData,buffer);	
 	}
 	
 	bool serial::SerialWrite(std::string serialSend)
@@ -135,37 +222,15 @@ namespace Serial
 
 
 
+//fcntl(fd_serialport, F_SETFL, 0);         /* causes read to block until new characters are present */
+//fcntl(fd_serialport, F_SETFL, FNDELAY);   /* it causes read to return immediately */
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
+THE BAUDRATE CAN BE CHANGED BY USING THE FOLLOWING FUNCTION;
+	n =  cfsetispeed(&terminalAttributes,B1200);
+        n += cfsetospeed(&terminalAttributes,B1200);
+*/
 
 /*
 **The C library function void perror(const char *str) prints a descriptive error message to stderr. First the string str is printed followed by a colon then a space.

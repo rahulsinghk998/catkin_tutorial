@@ -108,26 +108,46 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
+include_directories(include 
   ${catkin_INCLUDE_DIRS}
   ${roscpp_INCLUDE_DIRS}
   ${rospy_INCLUDE_DIRS}
 )
 #Adding executable and their linked libraries  #@Rahul:add_dependencies#what does this mean??
 
+add_library(serial1 src/serial.cpp)
+add_dependencies(serial1 catkin_tutorial_gencpp)
+target_link_libraries(serial1 ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
+
+
+
 add_executable(subscriber_node src/subscriber_node.cpp)
 target_link_libraries(subscriber_node ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
 
-add_executable(publisher_talker src/publisher_talker.cpp)
-target_link_libraries(publisher_talker ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
+#add_executable(publisher_talker src/publisher_talker.cpp)
+#target_link_libraries(publisher_talker ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
 
-add_executable(multiply_server src/server.cpp)
-add_dependencies(multiply_server catkin_tutorial_gencpp )   			
-target_link_libraries(multiply_server ${catkin_LIBRARIES} ${roscpp_LIBRARIES} )
+add_executable(serialtest src/serialtest.cpp)
+#add_dependencies(serialtest catkin_tutorial_gencpp)
+target_link_libraries(serialtest ${roscpp_LIBRARIES} ${rospy_LIBRARIES} serial1)
 
-add_executable(multiply_client src/client.cpp)
-target_link_libraries(multiply_client ${roscpp_LIBRARIES} ${catkin_LIBRARIES} )
-add_dependencies(multiply_client catkin_tutorial_gencpp)
+add_executable(serial_publisher_node src/serial_publisher_node.cpp)
+target_link_libraries(serial_publisher_node ${roscpp_LIBRARIES} ${rospy_LIBRARIES} serial1)
+
+add_executable(serial_subscriber_node src/serial_subscriber_node.cpp)
+target_link_libraries(serial_subscriber_node ${roscpp_LIBRARIES} ${rospy_LIBRARIES} serial1)
+
+#add_executable(serialtest2 src/serialtest2.cpp)
+#add_dependencies(serialtest2 catkin_tutorial_gencpp)
+#target_link_libraries(serialtest2 ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
+
+#add_executable(multiply_server src/server.cpp)
+#add_dependencies(multiply_server catkin_tutorial_gencpp )   			
+#target_link_libraries(multiply_server ${catkin_LIBRARIES} ${roscpp_LIBRARIES} )
+
+#add_executable(multiply_client src/client.cpp)
+#target_link_libraries(multiply_client ${roscpp_LIBRARIES} ${catkin_LIBRARIES} )
+#add_dependencies(multiply_client catkin_tutorial_gencpp)
 
 
 
@@ -169,8 +189,8 @@ add_dependencies(multiply_client catkin_tutorial_gencpp)
 ## Mark executables and/or libraries for installation
 install(TARGETS 
    #catkin_tutorial catkin_tutorial_node
-   publisher_talker
-   subscriber_node
+   #publisher_talker
+   #subscriber_node
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

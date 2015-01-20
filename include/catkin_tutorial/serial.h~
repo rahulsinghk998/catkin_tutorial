@@ -33,7 +33,7 @@ namespace Serial
 			bool portIsConnected;
 			struct termios oldtio,newtio;
 			int handle;
-			int dataBits;
+			int serialDataBits;
 		protected:
 			
 	};
