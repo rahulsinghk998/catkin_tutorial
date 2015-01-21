@@ -24,7 +24,7 @@ uint32_t GetSensorData(Serial::serial *serialport){
 		length=serialport->SerialRead(dataPtr,BUFFER);	//REQUEST FOR DATA READ AND STORE LENGHT OF READ DATA
 		printf("READ DATA: %s	LENGTH: %d \n",dataPtr, length);
 		usleep(100);
-		/*if(dataPtr[length-1]==' '){			//BREAKING CONDITION BETWEEN THE NEXT DATA I.E. A SPACEBAR
+		if(dataPtr[length-1]==' '){			//BREAKING CONDITION BETWEEN THE NEXT DATA I.E. A SPACEBAR
 			std::cout<<sensorData<<std::endl;			
 			break;
 		}
@@ -33,7 +33,7 @@ uint32_t GetSensorData(Serial::serial *serialport){
 			dataPtr=dataPtr+length;
 		}
 		std::cout<<"1 :"<<dataPtr<<std::endl;
-*/
+
 	}
 	return atoi(sensorData);
 }
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 	ros::Publisher publish_data=nh.advertise<std_msgs::UInt32>("IMU_DATA",1000);
 	ros::Rate frequency(100);
-	Serial::serial serialport(B9600,0,1,"/dev/ttyUSB1");
+	Serial::serial serialport(B9600,0,1,"/dev/ttyUSB0");
 	serialport.SerialConnect();
 	int i=0;
 	while(ros::ok()){
